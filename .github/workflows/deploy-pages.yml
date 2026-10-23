@@ -23,6 +23,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Download browser AI model assets
+        run: |
+          python -m pip install --upgrade huggingface_hub
+          mkdir -p poc/models/Xenova/clip-vit-base-patch32
+          hf download Xenova/clip-vit-base-patch32 \
+            --local-dir poc/models/Xenova/clip-vit-base-patch32 \
+            --include "config.json" "preprocessor_config.json" "special_tokens_map.json" "tokenizer.json" "tokenizer_config.json" "vocab.json" "merges.txt" "onnx/vision_model_q4f16.onnx" "onnx/text_model_q4f16.onnx"
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wardrobe — 3D POC</title>
+<style>
+:root{color-scheme:dark;--bg:#10110f;--panel:#191b18;--line:#30342e;--muted:#a7ad9f;--lime:#c7f36b;--cream:#f3f0e7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--cream);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}button,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:12px;background:#242720;color:var(--cream);padding:10px 14px}button:hover{border-color:var(--lime)}button.primary{background:var(--lime);color:#171910;border-color:var(--lime);font-weight:700}.app{max-width:1200px;margin:auto;padding:24px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.brand{font-size:22px;font-weight:800;letter-spacing:-.8px}.brand span{color:var(--lime)}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.85fr);gap:18px}.stage,.panel{border:1px solid var(--line);border-radius:20px;background:var(--panel);overflow:hidden}.stage-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}#scene{height:500px;position:relative;background:radial-gradient(ellipse at 50% 35%,#34382c,#1b1e18 62%,#151713)}#scene canvas{display:block;width:100%;height:100%}.hint{position:absolute;bottom:14px;left:16px;color:#d5dacd99;font-size:12px;pointer-events:none}.stage-foot{padding:12px 18px;display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.panel{padding:20px}.panel h2{font-size:20px;margin:4px 0 6px;letter-spacing:-.5px}.muted{color:var(--muted)}.statrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.stat{background:#22251f;border-radius:14px;padding:13px}.stat strong{font-size:23px;display:block}.stat span{font-size:12px;color:var(--muted)}.items{display:grid;gap:9px;margin-top:12px}.item{display:flex;align-items:center;gap:12px;border:1px solid var(--line);padding:10px;border-radius:13px}.swatch{width:40px;height:48px;border-radius:9px;flex-shrink:0}.item strong{display:block;font-size:13px}.item small{color:var(--muted)}.item button{margin-left:auto;padding:7px 10px;font-size:12px}.controls{display:flex;flex-wrap:wrap;gap:8px}.divider{height:1px;background:var(--line);margin:18px 0}.advice{padding:14px;border-radius:14px;background:#252b1c;border:1px solid #424c2e;margin-top:12px}.advice strong{color:var(--lime)}.advice p{margin:6px 0 0;font-size:13px;color:#d9dece}.footnote{font-size:11px;color:var(--muted);margin-top:15px}.pill{display:inline-flex;padding:5px 9px;border-radius:99px;background:#292d24;color:var(--lime);font-size:11px}@media(max-width:800px){.app{padding:14px}.layout{grid-template-columns:1fr}.top{align-items:flex-start}#scene{height:400px}.panel{padding:16px}}@media(max-width:420px){#scene{height:330px}.stage-head{padding:14px}.brand{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div><div class="brand">wardrobe<span>.</span></div><div class="eyebrow">Your clothes, in 3D</div></div><span class="pill">INTERACTIVE POC</span></header>
+<main class="layout">
+<section class="stage"><div class="stage-head"><div><div class="eyebrow">Closet view</div><strong>Everyday collection</strong></div><div class="controls"><button id="rotate">⟳ Rotate</button><button id="reset">Reset view</button></div></div><div id="scene"><div class="hint">Drag to orbit · Scroll to zoom</div></div><div class="stage-foot"><span>Procedural 3D garments · WebGL</span><span id="status">Starting 3D…</span></div></section>
+<aside class="panel"><div class="eyebrow">Local style assistant</div><h2>Get dressed, simply.</h2><p class="muted">A small rule-based engine suggests a look without sending your wardrobe to a server.</p>
+<div class="statrow"><div class="stat"><strong id="count">6</strong><span>pieces in closet</span></div><div class="stat"><strong>0</strong><span>cloud calls required</span></div></div>
+<div class="eyebrow">Your pieces</div><div id="items" class="items"></div>
+<div class="divider"></div><div class="eyebrow">Outfit generator</div><h2>What’s the plan?</h2><select id="occasion" style="width:100%;margin:8px 0 12px;padding:11px;border-radius:12px;background:#242720;color:var(--cream);border:1px solid var(--line)"><option value="casual">Everyday casual</option><option value="work">Work / smart casual</option><option value="evening">Evening out</option></select><button class="primary" id="suggest" style="width:100%">✦ Suggest an outfit</button><div class="advice" id="advice"><strong>Your next outfit</strong><p>Choose an occasion and generate a look. The recommendation runs locally in this browser.</p></div>
+<p class="footnote">POC limitations: garments are stylized procedural shapes, not scans of real clothes. Refreshing resets this demo; photo upload, durable storage, and mobile packaging are not included yet.</p></aside>
+</main>
+</div>
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.170.0/build/three.module.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+const mount=document.querySelector('#scene'); const scene=new THREE.Scene(); scene.background=new THREE.Color('#20231b');
+const camera=new THREE.PerspectiveCamera(38,mount.clientWidth/mount.clientHeight,.1,100);camera.position.set(5,4.2,8);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(mount.clientWidth,mount.clientHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;mount.prepend(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1.65,0);controls.enableDamping=true;controls.minDistance=4;controls.maxDistance=12;controls.maxPolarAngle=Math.PI*.49;
+scene.add(new THREE.HemisphereLight(0xe8edda,0x464333,2.1));const key=new THREE.DirectionalLight(0xfff1d7,3.2);key.position.set(4,8,5);key.castShadow=true;scene.add(key);const fill=new THREE.DirectionalLight(0xc4d5ff,1.1);fill.position.set(-5,4,-3);scene.add(fill);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.MeshStandardMaterial({color:'#24271f',roughness:.9}));floor.rotation.x=-Math.PI/2;floor.position.y=-.02;floor.receiveShadow=true;scene.add(floor);
+const mat=(color,roughness=.68,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
+function box(parent,w,h,d,material,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+const metal=mat('#8b9287',.28,.8),wood=mat('#a17b50'),dark=mat('#32372e');
+const rack=new THREE.Group();scene.add(rack);
+for(const x of [-2.15,2.15]){box(rack,.09,3.5,.09,metal,x,1.72,0);box(rack,.22,.1,.22,metal,x,.08,0);box(rack,.12,.08,.12,metal,x,3.48,0)}
+box(rack,4.5,.09,.1,metal,0,3.45,0);box(rack,4.25,.06,.08,wood,0,.24,0);box(rack,4.2,.055,.07,wood,0,.38,0);
+for(const z of [-.45,.45])box(rack,4.35,.055,.055,wood,0,.52,z);
+const pieces=[
+{id:'tee',name:'Cream T-shirt',kind:'top',color:'#e7dfca',label:'T-shirt',occasion:['casual','work'],x:-1.55},
+{id:'shirt',name:'Olive overshirt',kind:'top',color:'#697a4b',label:'Shirt',occasion:['casual','work'],x:-.88},
+{id:'hoodie',name:'Rust sweatshirt',kind:'top',color:'#b86643',label:'Sweatshirt',occasion:['casual','evening'],x:-.2},
+{id:'jeans',name:'Indigo jeans',kind:'bottom',color:'#344f75',label:'Jeans',occasion:['casual','work'],x:.48},
+{id:'trouser',name:'Charcoal trousers',kind:'bottom',color:'#424641',label:'Trousers',occasion:['work','evening'],x:1.15},
+{id:'jacket',name:'Sand jacket',kind:'outer',color:'#bca783',label:'Jacket',occasion:['work','evening'],x:1.82}
+];
+const garmentGroups={};
+function hanger(x){const g=new THREE.Group();g.position.set(x,3.17,0);rack.add(g);const hook=new THREE.Mesh(new THREE.TorusGeometry(.085,.018,8,18,Math.PI*1.7),metal);hook.rotation.z=Math.PI;hook.position.y=.13;g.add(hook);const bar=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.56,8),metal);bar.rotation.z=Math.PI/2;bar.position.y=-.015;g.add(bar);const sides=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.36,8),metal);sides.position.y=-.18;g.add(sides);return g}
+function makeTop(group,color,type){const m=mat(color);const torso=box(group,.48,.78,.16,m,0,-.53,0);if(type==='shirt'||type==='outer'){box(group,.08,.65,.19,m,-.31,-.49,0).rotation.z=-.16;box(group,.08,.65,.19,m,.31,-.49,0).rotation.z=.16;box(group,.05,.62,.18,mat('#e4dfcf'),0,-.5,.09)}else{box(group,.1,.64,.16,m,-.29,-.5,0).rotation.z=-.18;box(group,.1,.64,.16,m,.29,-.5,0).rotation.z=.18}box(group,.22,.06,.18,m,0,-.94,0);const neck=new THREE.Mesh(new THREE.TorusGeometry(.095,.025,8,18),mat('#24271f'));neck.position.y=-.11;group.add(neck);return torso}
+function makeBottom(group,color){const m=mat(color);box(group,.22,.82,.14,m,-.12,-.48,0).rotation.z=-.04;box(group,.22,.82,.14,m,.12,-.48,0).rotation.z=.04;box(group,.43,.13,.15,m,0,-.08,0)}
+pieces.forEach(p=>{const g=new THREE.Group();g.position.x=p.x;const hg=hanger(p.x);if(p.kind==='bottom'){makeBottom(g,p.color)}else{makeTop(g,p.color,p.kind==='outer'?'outer':p.kind==='top'&&p.id==='shirt'?'shirt':'tee')}g.position.y=2.84;rack.add(g);garmentGroups[p.id]=g;p.group=g;p.hanger=hg;});
+function focus(ids){pieces.forEach(p=>{const active=ids.includes(p.id);p.group.scale.setScalar(active?1.08:1);p.group.position.z=active?.08:0;p.group.traverse(o=>{if(o.isMesh&&o.material&&o.material.emissive){o.material.emissive.set(active?'#242b13':'#000000')}})})}
+document.querySelector('#items').innerHTML=pieces.map(p=>'<div class="item"><div class="swatch" style="background:'+p.color+'"></div><div><strong>'+p.name+'</strong><small>'+p.label+'</small></div><button data-id="'+p.id+'">View</button></div>').join('');
+document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{focus([b.dataset.id]);const p=pieces.find(x=>x.id===b.dataset.id);controls.target.set(p.x,2.3,0)});
+document.querySelector('#suggest').onclick=()=>{const occasion=document.querySelector('#occasion').value;const tops=pieces.filter(p=>p.kind==='top'&&p.occasion.includes(occasion));const bottoms=pieces.filter(p=>p.kind==='bottom'&&p.occasion.includes(occasion));const outer=pieces.filter(p=>p.kind==='outer'&&p.occasion.includes(occasion));const top=tops[(occasion==='work'?1:0)%tops.length];const bottom=bottoms[occasion==='evening'?1:0];const extra=occasion==='work'||occasion==='evening'?outer[0]:null;const chosen=[top,bottom,...(extra?[extra]:[])].filter(Boolean);focus(chosen.map(p=>p.id));document.querySelector('#advice').innerHTML='<strong>'+({casual:'Easy everyday',work:'Smart casual',evening:'Ready for the evening'}[occasion])+'</strong><p>'+chosen.map(p=>p.name).join(' + ')+'. Coordinated from your demo closet. Recommendation generated on this device; no AI model or server is required for this rule-based POC.</p>'};
+let auto=true;document.querySelector('#rotate').onclick=()=>{auto=!auto;document.querySelector('#rotate').textContent=auto?'Ⅱ Pause rotation':'⟳ Rotate'};document.querySelector('#reset').onclick=()=>{camera.position.set(5,4.2,8);controls.target.set(0,1.65,0);controls.update();focus([])};
+function resize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}new ResizeObserver(resize).observe(mount);
+function animate(){requestAnimationFrame(animate);if(auto)rack.rotation.y+=.0018;controls.update();renderer.render(scene,camera)}animate();document.querySelector('#status').textContent='3D ready · drag to explore';
+</script>
+</body></html>

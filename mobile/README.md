@@ -18,3 +18,7 @@ Cross-platform iOS and Android app built with Expo and React Native.
 - Outfit studio with selectable pieces and saved looks (in-memory prototype)
 
 Next milestones: persistent storage, 3D scene, weather/calendar integrations, and AI recommendations.
+
+## Milestone 2: Local persistence
+
+The app now stores closet items, favourite flags, the current outfit, and saved looks on the device using AsyncStorage. This is device-local storage, not cloud sync: data does not automatically follow you to another phone. Clothing photos selected from the library may use device-local URIs, so long-term photo durability should be verified on-device before release.

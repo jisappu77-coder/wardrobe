@@ -94,8 +94,9 @@ async function removePhotoBackground(file){
  const status=document.querySelector('#status');
  status.textContent='Removing background with AI… keep this page open.';
  try{
-  if(!window.WardrobeRemoveBackground){const mod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');window.WardrobeRemoveBackground=mod.removeBackground;}
-  const result=await window.WardrobeRemoveBackground(file,{model:'medium',output:{format:'image/png',quality:0.95}});
+  if(!window.WardrobeRemoveBackground){const mod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');window.WardrobeRemoveBackground=mod.default||mod.removeBackground||mod.default?.removeBackground;}
+  if(typeof window.WardrobeRemoveBackground!=='function')throw new Error('Background-removal module did not expose its removeBackground function');
+  const result=await window.WardrobeRemoveBackground(file,{model:'medium',output:{format:'image/png',quality:0.95},debug:true,progress:(key,current,total)=>{status.textContent='Loading background-removal AI: '+key+' '+Math.round(current/Math.max(total,1)*100)+'%';}});
   if(!(result instanceof Blob)||!result.type.includes('image'))throw new Error('Background removal returned no image');
   return result;
  }catch(err){console.error('AI background removal failed:',err);status.textContent='AI background removal failed; showing original photo. '+String(err?.message||err).slice(0,120);return null;}

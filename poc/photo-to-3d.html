@@ -3,12 +3,37 @@
 <style>
 :root{color-scheme:dark;--bg:#10110f;--panel:#1a1c18;--line:#34372f;--muted:#a8ad9f;--lime:#c7f36b;--white:#f4f1e8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:15px/1.5 system-ui,-apple-system,sans-serif}.app{max-width:1120px;margin:auto;padding:24px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}.brand{font-size:22px;font-weight:800}.brand b{color:var(--lime)}.muted,.eyebrow{color:var(--muted)}.eyebrow{text-transform:uppercase;letter-spacing:1.8px;font-size:11px}.pill{font-size:11px;border-radius:99px;background:#292d22;color:var(--lime);padding:6px 10px}.layout{display:grid;grid-template-columns:1.35fr .8fr;gap:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}.cardhead{padding:17px 19px;border-bottom:1px solid var(--line)}h1{font-size:26px;line-height:1.15;letter-spacing:-.8px;margin:7px 0}h2{font-size:18px;margin:0 0 7px}.viewer{height:520px;position:relative;background:radial-gradient(ellipse at center,#34382c,#181a16 72%)}#view{display:block;width:100%;height:100%}.viewerhint{position:absolute;bottom:12px;left:14px;font-size:12px;color:#d7ddca99;pointer-events:none}.viewerfoot{padding:12px 17px;display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.side{padding:19px}.drop{display:flex;align-items:center;justify-content:center;text-align:center;min-height:130px;padding:16px;border:1px dashed #626957;border-radius:14px;background:#20231d;cursor:pointer}.drop:hover{border-color:var(--lime)}.drop input{display:none}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button{border:1px solid var(--line);background:#282b24;color:var(--white);padding:10px 13px;border-radius:11px;font:inherit;cursor:pointer}button:hover{border-color:var(--lime)}button.primary{background:var(--lime);color:#171910;border-color:var(--lime);font-weight:750}button:disabled{opacity:.45;cursor:not-allowed}.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.swatch{width:28px;height:28px;border:2px solid #ffffff55;border-radius:50%;padding:0}.swatch[aria-pressed=true]{outline:2px solid var(--lime);outline-offset:2px}.divider{height:1px;background:var(--line);margin:18px 0}.note{font-size:12px;color:var(--muted);margin-top:14px}.status{font-size:12px;color:var(--lime);margin-top:10px;min-height:18px}.how{display:grid;gap:10px;margin-top:16px}.step{display:flex;gap:10px;align-items:flex-start;font-size:13px}.num{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#2a2d25;color:var(--lime);flex-shrink:0}.preview{width:100%;max-height:180px;object-fit:contain;display:none;margin-top:12px;border-radius:10px;background:#24271f}.label{display:block;margin:12px 0 5px;font-size:13px;color:var(--muted)}select{width:100%;background:#252820;color:var(--white);padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit}
 @media(max-width:760px){.app{padding:13px}.layout{grid-template-columns:1fr}.viewer{height:390px}.head{align-items:flex-start}h1{font-size:23px}}@media(max-width:420px){.viewer{height:330px}}
+
+/* Unified Wardrobe visual refresh */
+:root{--bg:#f5f3ed;--panel:#fffefa;--line:#e5e1d7;--muted:#77796f;--lime:#c7f36b;--white:#20231c;--cream:#20231c}
+body{background:var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.01em}
+.app{max-width:1280px;padding:clamp(16px,3vw,36px)}
+.brand{font-size:26px;letter-spacing:-1.2px;color:#20231c}.brand b,.brand span{color:#607d2a}
+.eyebrow{letter-spacing:1.7px;color:#77796f}
+.demo-nav{display:flex;gap:8px;flex-wrap:wrap;margin:-8px 0 24px;padding:7px;background:#eae7de;border:1px solid #dfdbd0;border-radius:15px;width:max-content;max-width:100%}
+.demo-nav a{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid transparent;border-radius:10px;color:#55584f;text-decoration:none;font-size:13px;font-weight:650;transition:background .18s,border-color .18s}
+.demo-nav a span{font-size:10px;color:#8a8d80;letter-spacing:.08em}
+.demo-nav a:hover{background:#f8f7f1;border-color:#d7d4c8;color:#20231c}
+.demo-nav a.active{background:#20231c;color:#f8f7f1;border-color:#20231c;box-shadow:0 2px 5px #20231c12}
+.demo-nav a.active span{color:#c7f36b}
+.stage,.panel,.card{background:var(--panel);border-color:var(--line);box-shadow:0 8px 28px #37352208}
+.stage,.card{border-radius:22px}
+.stage-head,.cardhead{background:#fffefa}
+button,select{border-radius:12px;transition:transform .16s,border-color .16s,background .16s}
+button:hover{transform:translateY(-1px)}
+button.primary{background:#20231c;color:#f8f7f1;border-color:#20231c}
+button.primary:hover{background:#39432b;border-color:#39432b}
+#scene,.viewer{background:radial-gradient(ellipse at 50% 35%,#e4e7d8 0%,#d6dac9 44%,#c5cbb6 100%)}
+.stat{background:#f2f0e8}.advice{background:#f2f5e9;border-color:#dce5c9}.advice strong{color:#536e21}.advice p{color:#4e5543}
+.drop{background:#f8f7f1;border-color:#c7c9b9}.drop:hover{background:#f2f5e9;border-color:#809a4b}
+select{background:#f8f7f1;color:#20231c;border-color:#dedbd0}
+@media(max-width:760px){.demo-nav{width:100%;gap:4px}.demo-nav a{flex:1;justify-content:center;padding:9px 8px;font-size:12px}.demo-nav a span{display:none}}
 </style></head><body><div class="app">
 <header class="head"><div><div class="brand">wardrobe<b>.</b></div><div class="eyebrow">Photo → 3D garment viewer</div></div><span class="pill">EXPERIMENTAL POC</span></header>
-<nav aria-label="POC demos" style="display:flex;gap:10px;flex-wrap:wrap;margin:-8px 0 20px">
-<a href="./index.html" style="display:inline-block;padding:9px 13px;border:1px solid #454a3e;border-radius:11px;color:#f4f1e8;text-decoration:none">3D Wardrobe</a>
-<a href="./photo-to-3d.html" style="display:inline-block;padding:9px 13px;border:1px solid #c7f36b;border-radius:11px;color:#c7f36b;text-decoration:none">Photo to 3D</a>
-<a href="./mesh-garment.html" style="display:inline-block;padding:9px 13px;border:1px solid #454a3e;border-radius:11px;color:#f4f1e8;text-decoration:none">Garment Mesh</a>
+<nav class="demo-nav" aria-label="POC demos">
+<a href="./index.html" class=""><span>01</span> 3D Wardrobe</a>
+<a href="./photo-to-3d.html" class="active"><span>02</span> Photo to 3D</a>
+<a href="./mesh-garment.html" class=""><span>03</span> Garment Mesh</a>
 </nav>
 <div style="margin-bottom:18px"><h1>See a dress in 3D.</h1><div class="muted">Upload a dress photo, isolate its silhouette, then view it on a rotatable 3D panel.</div></div>
 <main class="layout"><section class="card"><div class="cardhead"><div class="eyebrow">3D preview</div><strong id="viewtitle">Demo dress · procedural 3D</strong></div><div class="viewer"><canvas id="view"></canvas><div class="viewerhint">Drag to rotate · scroll to zoom</div></div><div class="viewerfoot"><span id="renderstatus">Starting renderer…</span><span>WebGL · runs in browser</span></div></section>

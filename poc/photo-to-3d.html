@@ -109,14 +109,19 @@ document.querySelector('#analyze').onclick=async()=>{
  const status=document.querySelector('#aistatus');status.textContent='Loading the AI model from this GitHub Pages site. The deployment workflow downloads the model files and publishes them with this site.';
  try{
   if(!navigator.onLine)throw new Error('Browser is offline');
-  if(!window.TransformersPipeline){status.textContent='Preparing AI library…';const mod=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');window.TransformersPipeline=mod.pipeline;window.TransformersEnv=mod.env;}
+  if(!window.TransformersPipeline){status.textContent='Preparing AI library…';const mod=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');window.TransformersPipeline=mod.pipeline;window.TransformersEnv=mod.env;window.TransformersRawImage=mod.RawImage;}
   // Load model assets only from this GitHub Pages site; never fall back to Hugging Face.
   window.TransformersEnv.allowLocalModels=true;
   window.TransformersEnv.allowRemoteModels=false;
   window.TransformersEnv.localModelPath='/wardrobe/poc/models/';
   if(!garmentClassifier)garmentClassifier=await window.TransformersPipeline('zero-shot-image-classification','Xenova/clip-vit-base-patch32',{dtype:'q4f16',progress_callback:(p)=>{if(p?.status==='progress'&&p?.file)status.textContent='Downloading AI model: '+p.file+(Number.isFinite(p.progress)?' · '+Math.round(p.progress)+'%':'');else if(p?.status==='initiate'&&p?.file)status.textContent='Starting download: '+p.file;}});
-  status.textContent='Analyzing garment photo in this browser…';btn.textContent='Analyzing…';
-  const result=await garmentClassifier(uploadedImage,garmentLabels.map(x=>x.label));
+  status.textContent='Preparing photo for the AI model…';btn.textContent='Analyzing…';
+  // Transformers.js expects its own RawImage input, not a browser HTMLImageElement.
+  const inputCanvas=document.createElement('canvas');inputCanvas.width=uploadedImage.naturalWidth||uploadedImage.width;inputCanvas.height=uploadedImage.naturalHeight||uploadedImage.height;
+  const inputContext=inputCanvas.getContext('2d',{willReadFrequently:true});if(!inputContext)throw new Error('Could not prepare the uploaded image for AI analysis');inputContext.drawImage(uploadedImage,0,0,inputCanvas.width,inputCanvas.height);
+  const modelImage=await window.TransformersRawImage.fromCanvas(inputCanvas);
+  status.textContent='Analyzing garment photo in this browser…';
+  const result=await garmentClassifier(modelImage,garmentLabels.map(x=>x.label));
   const best=result[0];const mapped=garmentLabels.find(x=>x.label===best.label);
   document.querySelector('#ailabel').textContent=mapped?mapped.value.charAt(0).toUpperCase()+mapped.value.slice(1):best.label;
   document.querySelector('#aiscore').textContent='Model confidence score: '+(best.score*100).toFixed(1)+'% · Treat as an estimate, not a guarantee.';

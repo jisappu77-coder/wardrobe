@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Wardrobe",
+    "slug": "wardrobe-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#f4f3ed"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jisappu.wardrobe"
+    },
+    "android": {
+      "package": "com.jisappu.wardrobe",
+      "adaptiveIcon": {
+        "backgroundColor": "#f4f3ed"
+      }
+    },
+    "plugins": ["expo-image-picker"]
+  }
+}

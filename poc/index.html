@@ -20,9 +20,10 @@
 <p class="footnote">POC limitations: garments are stylized procedural shapes, not scans of real clothes. Refreshing resets this demo; photo upload, durable storage, and mobile packaging are not included yet.</p></aside>
 </main>
 </div>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.170.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.170.0/examples/jsm/"}}</script>
 <script type="module">
-import * as THREE from 'https://unpkg.com/three@0.170.0/build/three.module.js';
-import {OrbitControls} from 'https://unpkg.com/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 const mount=document.querySelector('#scene'); const scene=new THREE.Scene(); scene.background=new THREE.Color('#20231b');
 const camera=new THREE.PerspectiveCamera(38,mount.clientWidth/mount.clientHeight,.1,100);camera.position.set(5,4.2,8);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(mount.clientWidth,mount.clientHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;mount.prepend(renderer.domElement);

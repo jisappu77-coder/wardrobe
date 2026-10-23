@@ -5,6 +5,11 @@
 @media(max-width:760px){.app{padding:13px}.layout{grid-template-columns:1fr}.viewer{height:390px}.head{align-items:flex-start}h1{font-size:23px}}@media(max-width:420px){.viewer{height:330px}}
 </style></head><body><div class="app">
 <header class="head"><div><div class="brand">wardrobe<b>.</b></div><div class="eyebrow">Photo → 3D garment viewer</div></div><span class="pill">EXPERIMENTAL POC</span></header>
+<nav aria-label="POC demos" style="display:flex;gap:10px;flex-wrap:wrap;margin:-8px 0 20px">
+<a href="./index.html" style="display:inline-block;padding:9px 13px;border:1px solid #454a3e;border-radius:11px;color:#f4f1e8;text-decoration:none">3D Wardrobe</a>
+<a href="./photo-to-3d.html" style="display:inline-block;padding:9px 13px;border:1px solid #c7f36b;border-radius:11px;color:#c7f36b;text-decoration:none">Photo to 3D</a>
+<a href="./mesh-garment.html" style="display:inline-block;padding:9px 13px;border:1px solid #454a3e;border-radius:11px;color:#f4f1e8;text-decoration:none">Garment Mesh</a>
+</nav>
 <div style="margin-bottom:18px"><h1>See a dress in 3D.</h1><div class="muted">Upload a dress photo, isolate its silhouette, then view it on a rotatable 3D panel.</div></div>
 <main class="layout"><section class="card"><div class="cardhead"><div class="eyebrow">3D preview</div><strong id="viewtitle">Demo dress · procedural 3D</strong></div><div class="viewer"><canvas id="view"></canvas><div class="viewerhint">Drag to rotate · scroll to zoom</div></div><div class="viewerfoot"><span id="renderstatus">Starting renderer…</span><span>WebGL · runs in browser</span></div></section>
 <aside class="card side"><h2>1. Add a dress photo</h2><p class="muted" style="font-size:13px;margin-top:0">Best results: one garment, front view, plain background, good lighting.</p><label class="drop" for="file"><span>＋<br><strong>Choose a photo</strong><br><small class="muted">JPG, PNG, or WebP · processed locally</small></span><input id="file" type="file" accept="image/*" /></label><img id="photo" class="preview" alt="Uploaded dress preview"/><div class="btns"><button id="remove" disabled>Remove photo</button><button id="reset">Reset 3D</button></div><div class="status" id="status" role="status">Demo garment ready. Upload a photo to try silhouette extraction.</div>

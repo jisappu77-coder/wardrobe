@@ -111,6 +111,7 @@ document.querySelector('#analyze').onclick=async()=>{
   if(!navigator.onLine)throw new Error('Browser is offline');
   if(!window.TransformersPipeline){status.textContent='Preparing AI library…';const mod=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');window.TransformersPipeline=mod.pipeline;window.TransformersEnv=mod.env;}
   // Load model assets only from this GitHub Pages site; never fall back to Hugging Face.
+  window.TransformersEnv.allowLocalModels=true;
   window.TransformersEnv.allowRemoteModels=false;
   window.TransformersEnv.localModelPath='/wardrobe/poc/models/';
   if(!garmentClassifier)garmentClassifier=await window.TransformersPipeline('zero-shot-image-classification','Xenova/clip-vit-base-patch32',{dtype:'q4f16',progress_callback:(p)=>{if(p?.status==='progress'&&p?.file)status.textContent='Downloading AI model: '+p.file+(Number.isFinite(p.progress)?' · '+Math.round(p.progress)+'%':'');else if(p?.status==='initiate'&&p?.file)status.textContent='Starting download: '+p.file;}});

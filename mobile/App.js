@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, Pressable, TextInput, Image, Alert, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { StatusBar } from 'expo-status-bar';
@@ -21,6 +22,7 @@ function Piece({item,onPress,onFavorite,compact=false}) {
 }
 export default function App() {
  const [tab,setTab]=useState('Home');
+ const [hydrated,setHydrated]=useState(false);
  const [items,setItems]=useState(initialItems);
  const [category,setCategory]=useState('All');
  const [query,setQuery]=useState('');
@@ -31,6 +33,8 @@ export default function App() {
  const [newCategory,setNewCategory]=useState('Tops');
  const [newColor,setNewColor]=useState('Cream');
  const [newImage,setNewImage]=useState(null);
+ useEffect(()=>{let alive=true;(async()=>{try{const raw=await AsyncStorage.getItem('wardrobe-state-v1');if(raw){const data=JSON.parse(raw);if(alive){if(Array.isArray(data.items))setItems(data.items);if(Array.isArray(data.savedLooks))setSavedLooks(data.savedLooks);if(Array.isArray(data.outfit))setOutfit(data.outfit);}}}catch(e){console.warn('Could not load saved wardrobe data',e);}finally{if(alive)setHydrated(true);}})();return()=>{alive=false;};},[]);
+ useEffect(()=>{if(!hydrated)return;const payload=JSON.stringify({items,savedLooks,outfit,version:1});AsyncStorage.setItem('wardrobe-state-v1',payload).catch(e=>console.warn('Could not save wardrobe data',e));},[items,savedLooks,outfit,hydrated]);
  const filtered=useMemo(()=>items.filter(i=>(category==='All'||(category==='Favourites'?i.favorite:i.category===category))&&i.name.toLowerCase().includes(query.toLowerCase())),[items,category,query]);
  const toggleFavorite=(id)=>setItems(old=>old.map(i=>i.id===id?{...i,favorite:!i.favorite}:i));
  const addToOutfit=(id)=>setOutfit(old=>old.includes(id)?old.length?old:old:[...old,id].slice(0,6));

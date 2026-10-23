@@ -67,10 +67,10 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const canvas=document.querySelector('#view'), host=canvas.parentElement;
 const scene=new THREE.Scene();scene.background=new THREE.Color('#20231b');
-const camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(0,0.4,6.8);
+const camera=new THREE.PerspectiveCamera(32,1,.1,100);camera.position.set(0,0.1,7.4);
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 scene.add(new THREE.HemisphereLight(0xf4f0df,0x484535,2.4));const key=new THREE.DirectionalLight(0xffefcf,3.1);key.position.set(3,5,5);scene.add(key);const rim=new THREE.DirectionalLight(0xc6d6ff,1.5);rim.position.set(-4,2,-3);scene.add(rim);
-const grid=new THREE.GridHelper(12,24,'#525747','#34382f');grid.position.y=-1.85;scene.add(grid);
+const grid=new THREE.GridHelper(12,24,'#525747','#34382f');grid.position.y=-1.85;grid.visible=false;scene.add(grid);
 const garment=new THREE.Group();scene.add(garment);let currentColor='#9b485a', uploadedImage=null, textureMode=false;
 const colors=['#9b485a','#c7f36b','#e9dfc9','#3c5b84','#6b7950','#292a2b','#d18a56','#a99bc9'];
 const swatches=document.querySelector('#swatches');colors.forEach((c,i)=>{const b=document.createElement('button');b.className='swatch';b.style.background=c;b.setAttribute('aria-label','Garment colour '+c);b.setAttribute('aria-pressed',String(i===0));b.onclick=()=>{currentColor=c;textureMode=false;swatches.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');buildGarment()};swatches.append(b)});
@@ -84,7 +84,7 @@ let photoPlane=null;
 function buildGarment(){while(garment.children.length) {const o=garment.children.pop();o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose()}const type=document.querySelector('#shape').value;
 if(uploadedImage){const texture=new THREE.Texture(uploadedImage);texture.colorSpace=THREE.SRGBColorSpace;texture.needsUpdate=true;const aspect=uploadedImage.width/uploadedImage.height;const plane=new THREE.PlaneGeometry(Math.min(2.3,1.65*aspect),Math.min(2.8,1.65/aspect));const m=material();if(textureMode){m.map=texture;m.needsUpdate=true}else{texture.dispose();}photoPlane=new THREE.Mesh(plane,m);photoPlane.position.z=.12;garment.add(photoPlane);
 const outline=makeOutline(uploadedImage);if(outline){outline.position.z=.17;garment.add(outline)}
-const back=createProcedural(type,new THREE.MeshStandardMaterial({color:currentColor,roughness:.88,side:THREE.DoubleSide}));back.scale.set(.6,.94,.6);back.position.z=-.14;back.traverse(o=>{if(o.isMesh)o.material.side=THREE.DoubleSide});garment.add(back);
+// Keep the uploaded photo as the single visible garment surface; do not add a mismatched procedural back.
 }else{garment.add(createProcedural(type,material()))}
 document.querySelector('#viewtitle').textContent=uploadedImage?'Uploaded photo · 3D textured surface':'Demo '+type+' · procedural 3D';
 }
@@ -134,7 +134,7 @@ document.querySelector('#analyze').onclick=async()=>{
 document.querySelector('#file').onchange=e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){document.querySelector('#status').textContent='Please choose an image file.';return}if(file.size>12*1024*1024){document.querySelector('#status').textContent='Choose an image under 12 MB.';return}const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{uploadedImage=img;document.querySelector('#analyze').disabled=false;document.querySelector('#aistatus').textContent='Photo ready. Select Analyze with AI to classify the garment.';document.querySelector('#photo').src=url;document.querySelector('#photo').style.display='block';document.querySelector('#remove').disabled=false;textureMode=true;buildGarment();document.querySelector('#status').textContent='Photo loaded locally. Rotate the surface to inspect it.';document.querySelector('#renderstatus').textContent='Photo loaded · approximate 3D';};img.onerror=()=>{URL.revokeObjectURL(url);document.querySelector('#status').textContent='Could not read that image. Try another.'};img.src=url};
 document.querySelector('#remove').onclick=()=>{uploadedImage=null;document.querySelector('#analyze').disabled=true;document.querySelector('#airesult').style.display='none';document.querySelector('#aistatus').textContent='Upload a garment photo to enable AI analysis.';textureMode=false;document.querySelector('#photo').removeAttribute('src');document.querySelector('#photo').style.display='none';document.querySelector('#file').value='';document.querySelector('#remove').disabled=true;buildGarment();document.querySelector('#status').textContent='Demo garment restored.';document.querySelector('#renderstatus').textContent='Demo 3D ready'};
 document.querySelector('#reset').onclick=()=>{controls.reset();garment.rotation.set(0,0,0)};
-const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=3.2;controls.maxDistance=10;controls.target.set(0,0,0);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enableRotate=true;controls.minPolarAngle=Math.PI*.30;controls.maxPolarAngle=Math.PI*.70;controls.minDistance=3.2;controls.maxDistance=10;controls.target.set(0,0,0);
 function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(host);resize();buildGarment();
 function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();document.querySelector('#renderstatus').textContent='3D renderer ready';
 </script></body></html>

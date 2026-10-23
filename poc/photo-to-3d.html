@@ -81,9 +81,30 @@ else if(type==='skirt'){const shape=new THREE.Shape().moveTo(-.3,.85).lineTo(.3,
 else{const torso=new THREE.Mesh(new THREE.BoxGeometry(.92,1.15,.18),mat);torso.position.y=.05;g.add(torso);for(const x of [-.58,.58]){const sleeve=new THREE.Mesh(new THREE.BoxGeometry(.27,.8,.18),mat);sleeve.position.set(x,.22,0);sleeve.rotation.z=x<0?-.18:.18;g.add(sleeve)}const neck=new THREE.Mesh(new THREE.TorusGeometry(.12,.025,8,24),new THREE.MeshStandardMaterial({color:'#282a25'}));neck.position.set(0,.63,.1);g.add(neck);if(type==='jacket'){const seam=new THREE.Mesh(new THREE.BoxGeometry(.025,1,.015),new THREE.MeshStandardMaterial({color:'#e5d6b9'}));seam.position.set(0,.02,.1);g.add(seam)}}
 return g}
 let photoPlane=null;
+function createPhotoRelief(img){
+ // Build a subdivided, displaced mesh from the photo instead of a flat PlaneGeometry.
+ // This is a single-view 2.5D approximation; it cannot infer unseen back/fabric geometry.
+ const width=img.naturalWidth||img.width,height=img.naturalHeight||img.height;
+ const aspect=width/height,worldW=Math.min(2.3,1.65*aspect),worldH=Math.min(2.8,1.65/aspect);
+ const sampleCanvas=document.createElement('canvas');sampleCanvas.width=96;sampleCanvas.height=128;
+ const ctx=sampleCanvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,96,128);
+ let pixels;try{pixels=ctx.getImageData(0,0,96,128).data}catch(e){pixels=null}
+ const geo=new THREE.PlaneGeometry(worldW,worldH,48,64);const pos=geo.attributes.position;
+ for(let i=0;i<pos.count;i++){
+  const x=pos.getX(i),y=pos.getY(i);const u=(x/worldW)+.5,v=.5-(y/worldH);
+  const px=Math.max(0,Math.min(95,Math.round(u*95))),py=Math.max(0,Math.min(127,Math.round(v*127))),idx=(py*96+px)*4;
+  let z=0;
+  if(pixels){const lum=(pixels[idx]*.299+pixels[idx+1]*.587+pixels[idx+2]*.114)/255;const alpha=pixels[idx+3]/255;const center=Math.max(0,1-Math.abs(u-.5)*1.8);z=(lum-.45)*.11+Math.sin(u*Math.PI)*.035+center*.035; if(alpha<.03)z=0;}
+  pos.setZ(i,z);
+ }
+ geo.computeVertexNormals();
+ const texture=new THREE.Texture(img);texture.colorSpace=THREE.SRGBColorSpace;texture.needsUpdate=true;
+ const mat=new THREE.MeshStandardMaterial({map:texture,transparent:true,alphaTest:.015,depthWrite:true,roughness:.8,metalness:0,side:THREE.DoubleSide});
+ const mesh=new THREE.Mesh(geo,mat);mesh.castShadow=true;mesh.receiveShadow=true;return mesh;
+}
 function buildGarment(){while(garment.children.length) {const o=garment.children.pop();o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose()}const type=document.querySelector('#shape').value;
-if(uploadedImage){const outline=makeOutline(uploadedImage);if(outline){outline.position.z=0;garment.add(outline)}else{const texture=new THREE.Texture(uploadedImage);texture.colorSpace=THREE.SRGBColorSpace;texture.needsUpdate=true;const aspect=uploadedImage.width/uploadedImage.height;const plane=new THREE.PlaneGeometry(Math.min(2.3,1.65*aspect),Math.min(2.8,1.65/aspect));const m=new THREE.MeshStandardMaterial({map:texture,transparent:true,alphaTest:.015,depthWrite:false,roughness:.82,side:THREE.DoubleSide});photoPlane=new THREE.Mesh(plane,m);photoPlane.position.z=0;garment.add(photoPlane)}}else{garment.add(createProcedural(type,material()))}
-document.querySelector('#viewtitle').textContent=uploadedImage?'Uploaded photo · 3D textured surface':'Demo '+type+' · procedural 3D';
+if(uploadedImage){photoPlane=createPhotoRelief(uploadedImage);garment.add(photoPlane)}else{garment.add(createProcedural(type,material()))}
+document.querySelector('#viewtitle').textContent=uploadedImage?'Photo-derived 3D relief · approximate depth':'Demo '+type+' · procedural 3D';
 }
 function makeOutline(img){return null;}
 document.querySelector('#shape').onchange=buildGarment;

@@ -11,6 +11,11 @@
 <body>
 <div class="app">
 <header class="top"><div><div class="brand">wardrobe<span>.</span></div><div class="eyebrow">Your clothes, in 3D</div></div><span class="pill">INTERACTIVE POC</span></header>
+<nav aria-label="POC demos" style="display:flex;gap:10px;flex-wrap:wrap;margin:-8px 0 20px">
+<a href="./index.html" style="display:inline-block;padding:9px 13px;border:1px solid #c7f36b;border-radius:11px;color:#c7f36b;text-decoration:none">3D Wardrobe</a>
+<a href="./photo-to-3d.html" style="display:inline-block;padding:9px 13px;border:1px solid #454a3e;border-radius:11px;color:#f3f0e7;text-decoration:none">Photo to 3D</a>
+<a href="./mesh-garment.html" style="display:inline-block;padding:9px 13px;border:1px solid #454a3e;border-radius:11px;color:#f3f0e7;text-decoration:none">Garment Mesh</a>
+</nav>
 <main class="layout">
 <section class="stage"><div class="stage-head"><div><div class="eyebrow">Closet view</div><strong>Everyday collection</strong></div><div class="controls"><button id="rotate">⟳ Rotate</button><button id="reset">Reset view</button></div></div><div id="scene"><div class="hint">Drag to orbit · Scroll to zoom</div></div><div class="stage-foot"><span>Procedural 3D garments · WebGL</span><span id="status">Starting 3D…</span></div></section>
 <aside class="panel"><div class="eyebrow">Local style assistant</div><h2>Get dressed, simply.</h2><p class="muted">A small rule-based engine suggests a look without sending your wardrobe to a server.</p>

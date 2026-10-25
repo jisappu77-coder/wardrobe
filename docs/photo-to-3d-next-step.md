@@ -33,3 +33,33 @@ The reconstruction adapter should return a standard 3D asset (prefer GLB/glTF) a
 
 ## Honesty about fidelity
 The first contour-based mesh is an approximation. It is useful to validate interaction and workflow, but it is not a physically accurate scan, cloth simulation, or virtual try-on model. High-fidelity reconstruction requires multi-view images or an image-to-3D model.
+
+
+## Local AI implementation decision (Android-first)
+
+### Current state
+- The GitHub Pages POC runs browser-side background removal and garment classification.
+- The current rotatable photo mesh is **not** a full image-to-3D reconstruction model.
+- The page now includes a browser WebGPU capability check and links to an open-source WebGPU image-to-3D implementation. It does not download or execute that model yet.
+- No cloud generation API or secret key is used.
+
+### Why the full model is not bundled into GitHub Pages
+The open-source SF3D WebGPU port documents a model weight file of roughly 2.1 GB and demonstrates inference on a high-end desktop GPU. Committing those weights to the repository is not appropriate, and successful inference on Android cannot be assumed. The browser must download model weights separately and a compatible GPU/browser must have enough memory. This is local inference after download, but it is not guaranteed to work offline on the first visit.
+
+### Recommended integration path
+1. Keep GitHub Pages as the lightweight mobile UI and Three.js GLB viewer.
+2. Integrate a WebGPU reconstruction adapter only after validating its model license, mobile support, model file hosting/cache strategy, and peak memory on representative Android devices.
+3. Keep model weights out of Git history; load versioned weights from a user-selected local file or a documented static asset host, with explicit download size and consent.
+4. Generate a GLB locally, validate it, then load it into the existing viewer. Do not substitute a depth-displaced image plane and label it as full 3D reconstruction.
+5. If the device is unsupported, retain the current preview with a clear approximation warning rather than uploading the photo to a cloud service.
+
+### Android acceptance tests before enabling generation
+- Recent Chrome on at least one mid-range and one high-end Android device.
+- WebGPU adapter available and model weights loaded without tab reload or browser termination.
+- Peak memory measured during inference, not just model download size.
+- Generated GLB rotates with coherent sides/back and exports successfully.
+- Airplane-mode behavior documented separately for first run and cached subsequent runs.
+- Network inspection confirms that the uploaded photo is not sent to an inference API.
+
+### Current page change
+The page includes a “Check device support” action. This reports secure-context/WebGPU adapter availability and the browser's exposed device-memory estimate. It is only a capability probe; it does not imply the reconstruction model is installed or that a device can run it.
